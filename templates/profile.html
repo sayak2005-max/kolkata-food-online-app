@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>My Profile</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f5f5f5;
+margin:0;
+}
+
+.container{
+width:900px;
+margin:auto;
+margin-top:40px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0px 3px 12px rgba(0,0,0,0.15);
+margin-bottom:25px;
+}
+
+.section-title{
+font-size:20px;
+margin-bottom:15px;
+color:#ff6347;
+}
+
+button{
+background:#ff6347;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#e5533c;
+}
+
+.address-box{
+background:#fafafa;
+padding:12px;
+margin-bottom:10px;
+border-radius:6px;
+}
+
+.logout-btn{
+background:#dc3545;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h2>👤 My Profile</h2>
+
+<p><strong>Mobile:</strong> {{ customer.mobile }}</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">
+
+📍 Saved Addresses
+
+</div>
+
+
+{% for address in addresses %}
+
+<div class="address-box">
+
+{{ address.address }}
+
+<br>
+
+{{ address.city }}
+
+-
+
+{{ address.pincode }}
+
+</div>
+
+{% empty %}
+
+<p>No address saved yet</p>
+
+{% endfor %}
+
+
+<h4>Add New Address</h4>
+
+<form method="POST" action="/add-address/">
+
+{% csrf_token %}
+
+<input
+type="text"
+name="address"
+placeholder="Full Address"
+required
+>
+
+<br><br>
+
+<input
+type="text"
+name="city"
+placeholder="City"
+required
+>
+
+<br><br>
+
+<input
+type="text"
+name="pincode"
+placeholder="Pincode"
+required
+>
+
+<br><br>
+
+<button type="submit">
+
+Save Address
+
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">
+
+📦 Orders
+
+</div>
+
+<a href="/order-history/">
+
+<button>
+
+View Order History
+
+</button>
+
+</a>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">
+
+⚙ Account Settings
+
+</div>
+
+<a href="/logout/">
+
+<button class="logout-btn">
+
+Logout
+
+</button>
+
+</a>
+
+</div>
+
+
+</div>
+
+</body>
+
+</html>

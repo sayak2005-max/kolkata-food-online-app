@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Order History</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#fff8f0;
+}
+
+.container{
+width:700px;
+margin:auto;
+margin-top:40px;
+background:white;
+padding:30px;
+border-radius:10px;
+}
+
+.order{
+border-bottom:1px solid #ddd;
+padding:10px;
+}
+
+.status{
+font-weight:bold;
+color:#ff6347;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Your Orders</h2>
+
+{% for order in orders %}
+
+<div class="order">
+
+Food: {{ order.item.name }}
+
+<br>
+
+Quantity: {{ order.quantity }}
+
+<br>
+
+Total: ₹{{ order.total_price }}
+
+<br>
+
+Status:
+
+<span class="status">
+
+{{ order.status }}
+
+</span>
+
+</div>
+
+{% empty %}
+
+<p>No previous orders found</p>
+
+{% endfor %}
+
+
+<a href="/home/">
+
+Back to Home
+
+</a>
+
+</div>
+
+</body>
+</html>

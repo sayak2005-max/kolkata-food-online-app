@@ -1,0 +1,364 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kolkata Food - Order Online</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+padding:0;
+}
+
+header{
+background:#f8b400;
+color:white;
+padding:20px;
+text-align:center;
+position:relative;
+}
+
+#back-btn{
+position:absolute;
+left:20px;
+top:20px;
+background:#555;
+color:white;
+border:none;
+padding:10px 15px;
+cursor:pointer;
+border-radius:4px;
+}
+
+.menu{
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.menu-section{
+width:65%;
+}
+
+.menu-item{
+display:flex;
+justify-content:space-between;
+padding:12px;
+border-bottom:1px solid #eee;
+}
+
+.cart{
+width:30%;
+background:#f9f9f9;
+padding:20px;
+border-radius:8px;
+position:sticky;
+top:20px;
+height:fit-content;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.cart-item{
+display:flex;
+justify-content:space-between;
+padding:8px 0;
+border-bottom:1px solid #ddd;
+}
+
+button{
+background:#28a745;
+color:white;
+border:none;
+padding:6px 12px;
+cursor:pointer;
+border-radius:4px;
+}
+
+.remove-btn{
+background:#dc3545;
+}
+
+.checkout-btn{
+width:100%;
+padding:12px;
+margin-top:10px;
+font-size:16px;
+}
+
+.category-title{
+margin-top:20px;
+color:#f8b400;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<button id="back-btn">← Back to Home</button>
+
+<h1>Kolkata Food</h1>
+
+<h2>Order Online</h2>
+
+</header>
+
+
+<section class="menu">
+
+
+<!-- MENU LIST -->
+
+<div class="menu-section">
+
+<h3>Available Menu Items</h3>
+
+
+{% regroup menu by category as category_list %}
+
+
+{% for category in category_list %}
+
+<h3 class="category-title">
+
+{{ category.grouper.name }}
+
+</h3>
+
+
+{% for item in category.list %}
+
+<div class="menu-item">
+
+<div>
+
+<strong>{{ item.name }}</strong>
+
+<br>
+
+₹{{ item.price }}
+
+</div>
+
+
+<button
+
+class="add-btn"
+
+data-name="{{ item.name }}"
+
+data-price="{{ item.price }}"
+
+>
+
++
+
+</button>
+
+</div>
+
+{% endfor %}
+
+{% endfor %}
+
+</div>
+
+
+
+<!-- CART SECTION -->
+
+<div class="cart">
+
+<h3>Your Cart</h3>
+
+<div id="cart-items"></div>
+
+<p>
+
+<strong>Total: ₹<span id="cart-total">0</span></strong>
+
+</p>
+
+
+<form id="checkout-form" action="/checkout/" method="POST">
+
+{% csrf_token %}
+
+<input type="hidden"
+
+id="cart-data"
+
+name="cart_data">
+
+<button
+
+type="submit"
+
+class="checkout-btn"
+
+>
+
+Proceed to Checkout
+
+</button>
+
+</form>
+
+</div>
+
+</section>
+
+
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+
+function updateCart(){
+
+const cartItems=document.getElementById("cart-items");
+
+const cartTotal=document.getElementById("cart-total");
+
+cartItems.innerHTML="";
+
+let total=0;
+
+
+cart.forEach((item,index)=>{
+
+total+=item.price*item.quantity;
+
+cartItems.innerHTML+=`
+
+<div class="cart-item">
+
+<span>${item.name} × ${item.quantity}</span>
+
+<button
+
+class="remove-btn"
+
+onclick="removeItem(${index})"
+
+>
+
+−
+
+</button>
+
+</div>
+
+`;
+
+});
+
+
+cartTotal.innerText=total;
+
+document.getElementById("cart-data").value=JSON.stringify(cart);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+}
+
+
+function removeItem(index){
+
+cart.splice(index,1);
+
+updateCart();
+
+}
+
+
+document.querySelectorAll(".add-btn").forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+const name=button.dataset.name;
+
+const price=parseInt(button.dataset.price);
+
+
+const existingItem=cart.find(item=>item.name===name);
+
+
+if(existingItem){
+
+existingItem.quantity++;
+
+}
+
+else{
+
+cart.push({
+
+name:name,
+
+price:price,
+
+quantity:1
+
+});
+
+}
+
+
+updateCart();
+
+});
+
+});
+
+
+document.getElementById("checkout-form").addEventListener("submit",function(e){
+
+if(cart.length===0){
+
+alert("Cart is empty!");
+
+e.preventDefault();
+
+}
+
+});
+
+
+document.getElementById("back-btn").addEventListener("click",function(){
+
+window.location.href="/home/";
+
+});
+
+
+updateCart();
+
+</script>
+
+
+
+<footer style="background:#333;color:white;text-align:center;padding:15px">
+
+© 2026 Kolkata Food | Authentic Bengali Cuisine
+
+</footer>
+
+
+</body>
+
+</html>

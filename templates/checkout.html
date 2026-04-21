@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Select Delivery Address</title>
+
+<style>
+
+#map{
+height:400px;
+width:80%;
+margin:auto;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<h2>Select Delivery Location</h2>
+
+
+<div id="map"></div>
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input
+type="text"
+id="address"
+name="address"
+placeholder="Selected address"
+required
+style="width:300px"
+>
+
+<br><br>
+
+<button type="submit">
+
+Confirm Location
+
+</button>
+
+</form>
+
+
+
+<script>
+
+let map;
+let marker;
+
+function initMap(){
+
+const kolkata={lat:22.5726,lng:88.3639};
+
+map=new google.maps.Map(
+
+document.getElementById("map"),
+
+{
+
+zoom:12,
+center:kolkata
+
+}
+
+);
+
+marker=new google.maps.Marker({
+
+position:kolkata,
+map:map,
+draggable:true
+
+});
+
+
+google.maps.event.addListener(
+
+marker,
+
+"dragend",
+
+function(){
+
+const lat=marker.getPosition().lat();
+
+const lng=marker.getPosition().lng();
+
+fetch(
+
+`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=YOUR_API_KEY`
+
+)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+document.getElementById(
+"address"
+).value=data.results[0].formatted_address;
+
+});
+
+});
+
+}
+
+</script>
+
+
+
+<script async defer
+
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+
+</script>
+
+
+</body>
+</html>

@@ -138,13 +138,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 RAZORPAY_KEY_ID = "rzp_test_SgTePbazlkO9yr"
 RAZORPAY_KEY_SECRET = "tNcI80jwljLwx47ONbnWAQhK"
 
-
-
-from django.contrib.auth.models import User
-
-if not User.objects.filter(username="Sayak").exists():
-    User.objects.create_superuser(
-        username="Sayak",
-        email="sayakmondal403@gmail.com",
-        password="Sayak@2005"
-    )

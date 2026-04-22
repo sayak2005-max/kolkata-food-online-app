@@ -28,4 +28,8 @@ path("add-address/", views.add_address),
 
 path("logout/", views.user_logout),
 
+path("payment-success/", views.payment_success),
+
+path("tracking/", views.tracking),
+
 ]

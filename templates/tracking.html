@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Tracking</title>
+<script>
+function updateStatus() {
+    fetch('/tracking/')
+    .then(response => response.text())
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const orders = doc.getElementById('orders').innerHTML;
+        document.getElementById('orders').innerHTML = orders;
+    });
+}
+setInterval(updateStatus, 5000);
+</script>
+</head>
+<body>
+<h2>Your Orders</h2>
+<div id="orders">
+{% for order in orders %}
+<p>Item: {{ order.item.name }} - Status: {{ order.status }}</p>
+{% endfor %}
+</div>
+</body>
+</html>

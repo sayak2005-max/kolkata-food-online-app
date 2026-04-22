@@ -193,23 +193,17 @@ data-price="{{ item.price }}"
 </p>
 
 
-<form id="checkout-form" action="/checkout/" method="POST">
+<form action="/checkout/" method="POST">
 
 {% csrf_token %}
 
-<input type="hidden"
-
+<input
+type="hidden"
+name="cart_data"
 id="cart-data"
-
-name="cart_data">
-
-<button
-
-type="submit"
-
-class="checkout-btn"
-
 >
+
+<button type="submit" class="checkout-btn">
 
 Proceed to Checkout
 

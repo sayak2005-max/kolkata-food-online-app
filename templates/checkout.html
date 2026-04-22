@@ -13,18 +13,30 @@ width:80%;
 margin:auto;
 }
 
+.cart-summary {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
 </style>
 
 </head>
 
 <body>
 
+<h2>Your Cart Summary</h2>
+
+<div class="cart-summary">
+    {% for item in cart %}
+    <p>{{ item.name }} - ₹{{ item.price }} x {{ item.quantity }} = ₹{{ item.price|mul:item.quantity }}</p>
+    {% endfor %}
+    <p><strong>Total: ₹{{ total }}</strong></p>
+</div>
 
 <h2>Select Delivery Location</h2>
 
-
 <div id="map"></div>
-
 
 <form method="POST">
 
@@ -43,7 +55,7 @@ style="width:300px"
 
 <button type="submit">
 
-Confirm Location
+Proceed to Payment
 
 </button>
 

@@ -82,6 +82,10 @@ cursor:pointer;
 border-radius:4px;
 }
 
+button:hover{
+opacity:0.9;
+}
+
 .remove-btn{
 background:#dc3545;
 }
@@ -98,6 +102,13 @@ margin-top:20px;
 color:#f8b400;
 }
 
+footer{
+background:#333;
+color:white;
+text-align:center;
+padding:15px;
+}
+
 </style>
 
 </head>
@@ -108,7 +119,15 @@ color:#f8b400;
 
 <header>
 
-<button id="back-btn">← Back to Home</button>
+<a href="/home/">
+
+<button id="back-btn">
+
+← Back to Home
+
+</button>
+
+</a>
 
 <h1>Kolkata Food</h1>
 
@@ -193,7 +212,7 @@ data-price="{{ item.price }}"
 </p>
 
 
-<form action="/checkout/" method="POST">
+<form action="/checkout/" method="POST" id="checkout-form">
 
 {% csrf_token %}
 
@@ -212,6 +231,7 @@ Proceed to Checkout
 </form>
 
 </div>
+
 
 </section>
 
@@ -243,13 +263,9 @@ cartItems.innerHTML+=`
 
 <span>${item.name} × ${item.quantity}</span>
 
-<button
+<button class="remove-btn"
 
-class="remove-btn"
-
-onclick="removeItem(${index})"
-
->
+onclick="removeItem(${index})">
 
 −
 
@@ -333,20 +349,13 @@ e.preventDefault();
 });
 
 
-document.getElementById("back-btn").addEventListener("click",function(){
-
-window.location.href="/home/";
-
-});
-
-
 updateCart();
 
 </script>
 
 
 
-<footer style="background:#333;color:white;text-align:center;padding:15px">
+<footer>
 
 © 2026 Kolkata Food | Authentic Bengali Cuisine
 

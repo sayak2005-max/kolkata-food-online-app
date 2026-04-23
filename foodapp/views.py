@@ -14,14 +14,12 @@ import json
 
 @login_required(login_url="/")
 def home(request):
-
     return render(request, "home.html")
 
 
 # ABOUT PAGE
 
 def about(request):
-
     return render(request, "about.html")
 
 
@@ -45,29 +43,29 @@ def checkout(request):
     if request.method == "POST":
 
         cart_data = request.POST.get("cart_data")
+        special_note = request.POST.get("special_note")
+        delivery_type = request.POST.get("delivery_type")
 
         if not cart_data:
-
             return redirect("/order/")
 
         cart = json.loads(cart_data)
 
+        # save session data
         request.session["cart"] = cart
+        request.session["special_note"] = special_note
+        request.session["delivery_type"] = delivery_type
 
 
     cart = request.session.get("cart", [])
 
     if not cart:
-
         return redirect("/order/")
 
 
     total = sum(
-
         item["price"] * item["quantity"]
-
         for item in cart
-
     )
 
 
@@ -75,43 +73,6 @@ def checkout(request):
 
     razorpay_order = create_order(total)
 
-
-    return render(
-
-        request,
-
-        "payment.html",
-
-        {
-
-            "razorpay_key": settings.RAZORPAY_KEY_ID,
-
-            "amount": razorpay_order["amount"],
-
-            "razorpay_order_id": razorpay_order["id"],
-
-            "total": total
-
-        }
-
-    )
-
-@login_required(login_url="/")
-def payment_page(request):
-
-    cart = request.session.get("cart", [])
-
-    if not cart:
-        return redirect("/order/")
-
-    total = sum(
-        item["price"] * item["quantity"]
-        for item in cart
-    )
-
-    from .payments import create_order
-
-    razorpay_order = create_order(total)
 
     return render(
         request,
@@ -133,9 +94,7 @@ def payment_success(request):
     if request.method == "POST":
 
         razorpay_order_id = request.POST.get("razorpay_order_id")
-
         payment_id = request.POST.get("razorpay_payment_id")
-
         signature = request.POST.get("razorpay_signature")
 
         from .payments import verify_payment
@@ -147,37 +106,42 @@ def payment_success(request):
         ):
 
             cart = request.session.get("cart", [])
-
-            address = request.session.get("address", "")
+            special_note = request.session.get("special_note")
+            delivery_type = request.session.get("delivery_type")
 
             customer, _ = Customer.objects.get_or_create(
                 user=request.user,
                 defaults={"mobile": request.user.username}
             )
 
-            customer.address = address
-            customer.save()
 
             for item in cart:
 
-                menu_item = Menu.objects.get(name=item["name"])
+                menu_item = Menu.objects.get(
+                    name=item["name"]
+                )
 
                 Order.objects.create(
                     customer=customer,
                     item=menu_item,
                     quantity=item["quantity"],
-                    total_price=item["price"] * item["quantity"]
+                    total_price=item["price"] * item["quantity"],
+                    special_note=special_note,
+                    delivery_type=delivery_type
                 )
 
+
+            # clear session
             request.session.pop("cart", None)
-            request.session.pop("address", None)
-            request.session.pop("razorpay_order_id", None)
+            request.session.pop("special_note", None)
+            request.session.pop("delivery_type", None)
 
             return redirect("/tracking/")
 
-        else:
 
+        else:
             return render(request, "payment_failed.html")
+
 
     return redirect("/")
 
@@ -253,7 +217,6 @@ def review(request, item_id):
     if request.method == "POST":
 
         rating = request.POST.get("rating")
-
         comment = request.POST.get("comment")
 
         Review.objects.create(
@@ -315,9 +278,7 @@ def add_address(request):
     if request.method == "POST":
 
         address = request.POST.get("address")
-
         city = request.POST.get("city")
-
         pincode = request.POST.get("pincode")
 
         customer, _ = Customer.objects.get_or_create(
@@ -340,7 +301,9 @@ def add_address(request):
 @login_required(login_url="/")
 def dashboard(request):
 
-    revenue = Order.objects.aggregate(Sum("total_price"))
+    revenue = Order.objects.aggregate(
+        Sum("total_price")
+    )
 
     orders = Order.objects.count()
 

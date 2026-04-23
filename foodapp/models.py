@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+# CUSTOMER MODEL
+
 class Customer(models.Model):
 
     user = models.OneToOneField(
@@ -14,19 +16,28 @@ class Customer(models.Model):
         unique=True
     )
 
-    address = models.TextField(blank=True)
+    address = models.TextField(
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.mobile
 
 
+# CATEGORY MODEL
+
 class Category(models.Model):
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
 
     def __str__(self):
         return self.name
 
+
+# MENU MODEL
 
 class Menu(models.Model):
 
@@ -35,24 +46,36 @@ class Menu(models.Model):
         on_delete=models.CASCADE
     )
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
 
     price = models.IntegerField()
 
-    description = models.TextField()
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
 
     image = models.ImageField(
         upload_to="menu_images/",
-        blank=True
+        blank=True,
+        null=True
     )
 
-    is_available = models.BooleanField(default=True)
+    is_available = models.BooleanField(
+        default=True
+    )
 
-    is_veg = models.BooleanField(default=True)
+    is_veg = models.BooleanField(
+        default=True
+    )
 
     def __str__(self):
         return self.name
 
+
+# ORDER MODEL (UPDATED VERSION)
 
 class Order(models.Model):
 
@@ -61,6 +84,11 @@ class Order(models.Model):
         ("Ready", "Ready"),
         ("Out for delivery", "Out for delivery"),
         ("Delivered", "Delivered"),
+    )
+
+    DELIVERY_TYPE = (
+        ("self", "Self Pickup"),
+        ("home", "Home Delivery"),
     )
 
     customer = models.ForeignKey(
@@ -77,7 +105,14 @@ class Order(models.Model):
 
     special_note = models.CharField(
         max_length=200,
-        blank=True
+        blank=True,
+        null=True
+    )
+
+    delivery_type = models.CharField(
+        max_length=10,
+        choices=DELIVERY_TYPE,
+        default="self"
     )
 
     total_price = models.IntegerField()
@@ -92,6 +127,11 @@ class Order(models.Model):
         auto_now_add=True
     )
 
+    def __str__(self):
+        return f"{self.customer} - {self.item}"
+
+
+# REVIEW MODEL
 
 class Review(models.Model):
 
@@ -109,6 +149,11 @@ class Review(models.Model):
 
     comment = models.TextField()
 
+    def __str__(self):
+        return f"{self.user} - {self.item}"
+
+
+# ADDRESS MODEL
 
 class Address(models.Model):
 
@@ -120,6 +165,13 @@ class Address(models.Model):
 
     address = models.TextField()
 
-    city = models.CharField(max_length=100)
+    city = models.CharField(
+        max_length=100
+    )
 
-    pincode = models.CharField(max_length=10)
+    pincode = models.CharField(
+        max_length=10
+    )
+
+    def __str__(self):
+        return f"{self.customer} - {self.city}"

@@ -16,6 +16,7 @@ body{
 font-family:Arial;
 margin:0;
 padding:0;
+background:#fff8f0;
 }
 
 header{
@@ -82,10 +83,6 @@ cursor:pointer;
 border-radius:4px;
 }
 
-button:hover{
-opacity:0.9;
-}
-
 .remove-btn{
 background:#dc3545;
 }
@@ -98,8 +95,25 @@ font-size:16px;
 }
 
 .category-title{
-margin-top:20px;
+margin-top:25px;
 color:#f8b400;
+font-size:22px;
+}
+
+.sub-category{
+margin-left:10px;
+color:#555;
+font-size:18px;
+}
+
+textarea{
+width:100%;
+padding:8px;
+margin-top:10px;
+}
+
+.delivery-option{
+margin-top:15px;
 }
 
 footer{
@@ -121,11 +135,7 @@ padding:15px;
 
 <a href="/home/">
 
-<button id="back-btn">
-
-← Back to Home
-
-</button>
+<button id="back-btn">← Back to Home</button>
 
 </a>
 
@@ -158,7 +168,18 @@ padding:15px;
 </h3>
 
 
-{% for item in category.list %}
+{% regroup category.list by food_type as type_list %}
+
+{% for type in type_list %}
+
+<h4 class="sub-category">
+
+{{ type.grouper }}
+
+</h4>
+
+
+{% for item in type.list %}
 
 <div class="menu-item">
 
@@ -183,11 +204,13 @@ data-price="{{ item.price }}"
 
 >
 
-+
+Add
 
 </button>
 
 </div>
+
+{% endfor %}
 
 {% endfor %}
 
@@ -212,17 +235,79 @@ data-price="{{ item.price }}"
 </p>
 
 
+<!-- SPECIAL INSTRUCTIONS -->
+
+<label>Special Instructions:</label>
+
+<textarea id="special-note"
+
+placeholder="Example: less spicy, extra spicy">
+
+</textarea>
+
+
+<!-- DELIVERY OPTIONS -->
+
+<div class="delivery-option">
+
+<label>
+
+<input type="radio"
+
+name="delivery_type"
+
+value="self"
+
+checked>
+
+Self Pickup
+
+</label>
+
+
+<label>
+
+<input type="radio"
+
+name="delivery_type"
+
+value="home">
+
+Home Delivery
+
+</label>
+
+</div>
+
+
 <form action="/checkout/" method="POST" id="checkout-form">
 
 {% csrf_token %}
 
-<input
-type="hidden"
-name="cart_data"
-id="cart-data"
->
+<input type="hidden"
 
-<button type="submit" class="checkout-btn">
+name="cart_data"
+
+id="cart-data">
+
+
+<input type="hidden"
+
+name="special_note"
+
+id="special-note-hidden">
+
+
+<input type="hidden"
+
+name="delivery_type"
+
+id="delivery-type-hidden">
+
+
+<button type="submit"
+
+class="checkout-btn">
 
 Proceed to Checkout
 
@@ -230,8 +315,8 @@ Proceed to Checkout
 
 </form>
 
-</div>
 
+</div>
 
 </section>
 
@@ -257,6 +342,7 @@ cart.forEach((item,index)=>{
 
 total+=item.price*item.quantity;
 
+
 cartItems.innerHTML+=`
 
 <div class="cart-item">
@@ -280,9 +366,15 @@ onclick="removeItem(${index})">
 
 cartTotal.innerText=total;
 
-document.getElementById("cart-data").value=JSON.stringify(cart);
 
-localStorage.setItem("cart",JSON.stringify(cart));
+document.getElementById("cart-data").value=
+
+JSON.stringify(cart);
+
+
+localStorage.setItem("cart",
+
+JSON.stringify(cart));
 
 }
 
@@ -296,7 +388,9 @@ updateCart();
 }
 
 
-document.querySelectorAll(".add-btn").forEach(button=>{
+document.querySelectorAll(".add-btn")
+
+.forEach(button=>{
 
 button.addEventListener("click",()=>{
 
@@ -305,7 +399,9 @@ const name=button.dataset.name;
 const price=parseInt(button.dataset.price);
 
 
-const existingItem=cart.find(item=>item.name===name);
+const existingItem=
+
+cart.find(item=>item.name===name);
 
 
 if(existingItem){
@@ -336,7 +432,11 @@ updateCart();
 });
 
 
-document.getElementById("checkout-form").addEventListener("submit",function(e){
+document.getElementById("checkout-form")
+
+.addEventListener("submit",
+
+function(e){
 
 if(cart.length===0){
 
@@ -344,7 +444,24 @@ alert("Cart is empty!");
 
 e.preventDefault();
 
+return;
+
 }
+
+
+document.getElementById("special-note-hidden").value=
+
+document.getElementById("special-note").value;
+
+
+document.getElementById("delivery-type-hidden").value=
+
+document.querySelector(
+
+'input[name="delivery_type"]:checked'
+
+).value;
+
 
 });
 
